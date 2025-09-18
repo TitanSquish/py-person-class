@@ -1,32 +1,26 @@
 class Person:
-    # Class attribute to store all created Person instances
     people = {}
 
     def __init__(self, name: str, age: int) -> None:
         self.name = name
         self.age = age
-        # Add instance to the class-level dictionary
         Person.people[name] = self
 
 
 def create_person_list(people: list[dict]) -> list[Person]:
-    result = []
-    name_to_person = {}
+    result = [Person(d.get("name"), d.get("age")) for d in people]
+    name_to_person = {p.name: p for p in result}
 
-    # First pass: create Person objects
     for person_dict in people:
-        person = Person(person_dict["name"], person_dict["age"])
-        result.append(person)
-        name_to_person[person.name] = person
+        person_name = person_dict.get("name")
+        person = name_to_person.get(person_name)
 
-    # Second pass: set wife/husband relationships
-    for person_dict in people:
-        person = name_to_person[person_dict["name"]]
+        wife_name = person_dict.get("wife")
+        if wife_name:
+            person.wife = name_to_person.get(wife_name)
 
-        if "wife" in person_dict and person_dict["wife"]:
-            person.wife = name_to_person[person_dict["wife"]]
-
-        if "husband" in person_dict and person_dict["husband"]:
-            person.husband = name_to_person[person_dict["husband"]]
+        husband_name = person_dict.get("husband")
+        if husband_name:
+            person.husband = name_to_person.get(husband_name)
 
     return result
